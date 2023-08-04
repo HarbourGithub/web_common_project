@@ -1,72 +1,91 @@
 import Redux from "./redux.js"
 const showCount = document.getElementsByClassName('show-count')
-const showNumber = document.getElementsByClassName('show-number')
 const addCount = document.getElementsByClassName('add-count')
-const addNumber = document.getElementsByClassName('add-number')
 const minusCount = document.getElementsByClassName('minus-count')
-const minusNumber = document.getElementsByClassName('minus-number')
+const showUserInfo = document.getElementsByClassName('show-user-info')
+const changeUserName = document.getElementsByClassName('change-user-name')
+const changeUserAge = document.getElementsByClassName('change-user-age')
 
-const countReducer = (state = { count: 0 }, action) => {
-    switch (action.type) {
+const incrementCount = (payload) => {
+    return { type: 'incrementCount', payload }
+}
+const decrementCount = (payload) => {
+    return { type: 'decrementCount', payload }
+}
+
+const countReducer = (state = 0, action) => {
+    const { type, payload } = action
+    switch (type) {
         case 'incrementCount':
-            return { count: state.count + 1 }
+            return state + payload
         case 'decrementCount':
-            return { count: state.count - 1 }
+            return state - payload
         default:
             return state
     }
 }
 
-const numberReducer = (state = { number: 0 }, action) => {
-    switch (action.type) {
-        case 'incrementNumber':
-            return { number: state.number + 1 }
-        case 'decrementNumber':
-            return { number: state.number - 1 }
+const changeUserNameAction = (payload) => {
+    return { type: 'changeUserName', payload }
+}
+const changeUserAgeAction = (payload) => {
+    return { type: 'changeUserAge', payload }
+}
+
+const userInfoReducer = (state = {name: '张三', age: 18}, action) => {
+    const { type, payload } = action
+    switch (type) {
+        case 'changeUserName':
+            return {...state, name: payload}
+        case 'changeUserAge':
+            return {...state, age: payload}
         default:
             return state
     }
 }
 
 const rootReducer = Redux.combineReducers({
-    counter: countReducer,
-    number: numberReducer,
+    count: countReducer,
+    userInfo: userInfoReducer,
 })
-
-console.log(rootReducer)
 
 const store = Redux.createStore(rootReducer)
 
 const { dispatch, getState, subscribe} = store
 
-const assignCount = () => {
-    showCount[0].innerHTML = getState().counter.count
-    console.log('111111')
-}
+const boundActionsCreators = Redux.bindActionCreators({ 
+    incrementCount, 
+    decrementCount,
+    changeUserNameAction,
+    changeUserAgeAction
+}, dispatch)
 
-const assignNumber = () => {
-    showNumber[0].innerHTML = getState().number.number
-    console.log('222222')
+const assignCount = () => {
+    showCount[0].innerHTML = getState().count
+}
+const assignUserInfo = () => {
+    const userInfo = getState().userInfo
+    showUserInfo[0].innerHTML = `姓名：${userInfo.name}，年龄：${userInfo.age}`
 }
 
 assignCount()
-assignNumber()
+assignUserInfo()
 
 subscribe(assignCount)
-subscribe(assignNumber)
+subscribe(assignUserInfo)
 
 addCount[0].addEventListener('click', () => {
-    dispatch({ type: 'incrementCount' })
-})
-
-addNumber[0].addEventListener('click', () => {
-    dispatch({ type: 'incrementNumber' })
+    boundActionsCreators.incrementCount(3)
 })
 
 minusCount[0].addEventListener('click', () => {
-    dispatch({ type: 'decrementCount' })
+    boundActionsCreators.decrementCount(2)
 })
 
-minusNumber[0].addEventListener('click', () => {
-    dispatch({ type: 'decrementNumber' })
+changeUserName[0].addEventListener('click', () => {
+    boundActionsCreators.changeUserNameAction('李四')
+})
+
+changeUserAge[0].addEventListener('click', () => {
+    boundActionsCreators.changeUserAgeAction(20)
 })
