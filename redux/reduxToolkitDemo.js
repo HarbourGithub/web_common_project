@@ -1,44 +1,33 @@
 import ReduxToolkit from "./redux-toolkit.umd.js"
 
-// 使用Redux Toolkit的createSlice方法创建reducer
-const counterSlice = ReduxToolkit.createSlice({
-    name: 'counter',
-    initialState: { count: 0 },
-    reducers: {
-        incrementCount: (state) => {
-            state.count += 1
-        },
-        decrementCount: (state) => {
-            state.count -= 1
-        },
-    },
-})
+const showCount = document.getElementsByClassName('show-count')
+const addCount = document.getElementsByClassName('add-count')
+const minusCount = document.getElementsByClassName('minus-count')
+const showUserInfo = document.getElementsByClassName('show-user-info')
+const changeUserName = document.getElementsByClassName('change-user-name')
+const changeUserAge = document.getElementsByClassName('change-user-age')
 
-const numberSlice = ReduxToolkit.createSlice({
-    name: 'number',
-    initialState: { number: 0 },
-    reducers: {
-        incrementNumber: (state) => {
-            state.number += 1
-        },
-        decrementNumber: (state) => {
-            state.number -= 1
-        },
-    },
-})
+const countReducer = (state = 0, action) => {
+    const { type, payload } = action
+    switch (type) {
+        case 'incrementCount':
+            return state + payload
+        case 'decrementCount':
+            return state - payload
+        default:
+            return state
+    }
+}
 
 // 使用Redux Toolkit的configureStore方法创建store
 const store = ReduxToolkit.configureStore({
     reducer: {
-        counter: counterSlice.reducer,
-        number: numberSlice.reducer,
+        counter: countReducer
     },
 })
 
-// 使用Redux Toolkit的createAction方法创建action
-// const { incrementCount, decrementCount } = counterSlice.actions
-// const { incrementNumber, decrementNumber } = numberSlice.actions
+const incrementCount = ReduxToolkit.createAction('incrementCount')
+const decrementCount = ReduxToolkit.createAction('decrementCount')
 
-// store.dispatch(incrementCount())
-// console.log('初始状态：', store.getState())
 
+console.log(incrementCount.toString(), decrementCount.toString())

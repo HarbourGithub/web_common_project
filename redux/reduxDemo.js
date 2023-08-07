@@ -1,4 +1,5 @@
 import Redux from "./redux.js"
+import ReduxThunk from "./redux-thunk.js"
 const showCount = document.getElementsByClassName('show-count')
 const addCount = document.getElementsByClassName('add-count')
 const minusCount = document.getElementsByClassName('minus-count')
@@ -26,7 +27,11 @@ const countReducer = (state = 0, action) => {
 }
 
 const changeUserNameAction = (payload) => {
-    return { type: 'changeUserName', payload }
+    return (dispatch, getState) => {
+        setTimeout(() => {
+            dispatch({ type: 'changeUserName', payload })
+        }, 1000)
+    }
 }
 const changeUserAgeAction = (payload) => {
     return { type: 'changeUserAge', payload }
@@ -49,12 +54,19 @@ const rootReducer = Redux.combineReducers({
     userInfo: userInfoReducer,
 })
 
-const store = Redux.createStore(rootReducer)
+const loggerMiddleware = (store) => (next) => (action) => {
+    console.log('dispatching', action)
+    const result = next(action)
+    console.log('next state', store.getState())
+    return result
+}
+
+const store = Redux.createStore(rootReducer, Redux.applyMiddleware(ReduxThunk, loggerMiddleware))
 
 const { dispatch, getState, subscribe} = store
 
 const boundActionsCreators = Redux.bindActionCreators({ 
-    incrementCount, 
+    incrementCount,
     decrementCount,
     changeUserNameAction,
     changeUserAgeAction
